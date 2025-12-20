@@ -48,12 +48,20 @@ cd dotler
 npm install
 ```
 
-3. Start the development server:
+3. Set up environment variables:
+```bash
+# Copy the example env file
+cp .env.example .env
+
+# Edit .env and add your Firebase configuration
+```
+
+4. Start the development server:
 ```bash
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+5. Open your browser and navigate to `http://localhost:5173`
 
 ### Build for Production
 
@@ -95,10 +103,15 @@ dotler/
 
 ## Firebase Configuration
 
-The Firebase configuration is already set up in `src/config/firebase.ts`. Make sure your Firebase project has:
+Firebase credentials are stored securely in environment variables. To set up:
 
-- Authentication enabled (Google and Email/Password providers)
-- Authorized domains configured for your deployment
+1. Create a `.env` file in the root directory (use `.env.example` as template)
+2. Add your Firebase project credentials to the `.env` file
+3. Make sure your Firebase project has:
+   - Authentication enabled (Google and Email/Password providers)
+   - Authorized domains configured for your deployment
+
+**Important**: Never commit the `.env` file to version control. It's already included in `.gitignore`.
 
 ## Features in Development
 
