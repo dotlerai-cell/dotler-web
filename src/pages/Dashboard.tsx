@@ -13,7 +13,6 @@ import {
   Instagram,
   Globe,
   Facebook,
-  ArrowUpRight,
   Activity
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
