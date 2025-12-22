@@ -8,15 +8,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#FF3B3B',
+        primary: '#ec1313',
+        'background-light': '#f8f6f6',
+        'background-dark': '#181111',
+        'surface-dark': '#2a1a1a',
+        'border-dark': '#392828',
         dark: {
-          bg: '#000000',
-          card: '#111111',
-          border: '#333333',
+          bg: '#181111',
+          card: '#2a1a1a',
+          border: '#392828',
         }
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
+        display: ['Inter', 'sans-serif'],
+      },
+      borderRadius: {
+        DEFAULT: '0.25rem',
+        lg: '0.5rem',
+        xl: '0.75rem',
+        full: '9999px',
       },
     },
   },
