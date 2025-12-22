@@ -11,7 +11,7 @@ const Card = ({ children, className = '', hover = false }: CardProps) => {
   return (
     <motion.div
       whileHover={hover ? { scale: 1.02 } : {}}
-      className={`bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-xl p-6 ${className}`}
+      className={`bg-[#111111] border border-[#333333] rounded-xl p-6 ${className}`}
     >
       {children}
     </motion.div>

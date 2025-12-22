@@ -33,9 +33,9 @@ const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
     <motion.div
       initial={false}
       animate={{ width: isCollapsed ? 80 : 250 }}
-      className="bg-dark-card border-r border-dark-border h-screen flex flex-col relative"
+      className="bg-[#111111] border-r border-[#333333] h-screen flex flex-col relative"
     >
-      <div className="p-6 border-b border-dark-border">
+      <div className="p-6 border-b border-[#333333]">
         <AnimatePresence mode="wait">
           {!isCollapsed ? (
             <motion.h1
@@ -73,7 +73,7 @@ const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 isActive
                   ? 'bg-primary text-white'
-                  : 'text-gray-400 hover:bg-dark-border hover:text-white'
+                  : 'text-gray-400 hover:bg-[#333333] hover:text-white'
               }`}
             >
               <Icon className="w-5 h-5 flex-shrink-0" />
@@ -94,7 +94,7 @@ const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
         })}
       </nav>
 
-      <div className="p-4 border-t border-dark-border space-y-2">
+      <div className="p-4 border-t border-[#333333] space-y-2">
         {!isCollapsed && currentUser && (
           <div className="px-4 py-2 mb-2">
             <p className="text-white text-sm font-medium truncate">
@@ -106,7 +106,7 @@ const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
         
         <button
           onClick={() => logout()}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-border hover:text-white transition-all"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-[#333333] hover:text-white transition-all"
         >
           <LogOut className="w-5 h-5 flex-shrink-0" />
           {!isCollapsed && <span className="text-sm font-medium">Logout</span>}
@@ -115,7 +115,7 @@ const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
 
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-20 bg-dark-card border border-dark-border rounded-full p-1 hover:bg-dark-border transition-colors"
+        className="absolute -right-3 top-20 bg-[#111111] border border-[#333333] rounded-full p-1 hover:bg-[#333333] transition-colors"
       >
         {isCollapsed ? (
           <ChevronRight className="w-4 h-4 text-gray-400" />
