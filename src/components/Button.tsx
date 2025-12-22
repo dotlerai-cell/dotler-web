@@ -11,8 +11,8 @@ interface ButtonProps {
 const Button = ({ children, variant = 'primary', onClick, className = '' }: ButtonProps) => {
   const baseStyles = 'px-6 py-3 rounded-lg font-medium transition-colors';
   const variants = {
-    primary: 'bg-primary hover:bg-red-600 text-white',
-    secondary: 'bg-gray-200 dark:bg-dark-border hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-900 dark:text-white',
+    primary: 'bg-primary hover:bg-red-600 text-white shadow-[0_0_15px_rgba(236,19,19,0.4)] hover:shadow-[0_0_25px_rgba(236,19,19,0.6)]',
+    secondary: 'bg-transparent border border-[#333333] hover:bg-[#333333] text-white',
   };
 
   return (

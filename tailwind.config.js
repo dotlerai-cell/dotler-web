@@ -9,14 +9,14 @@ export default {
     extend: {
       colors: {
         primary: '#ec1313',
-        'background-light': '#f8f6f6',
-        'background-dark': '#181111',
-        'surface-dark': '#2a1a1a',
-        'border-dark': '#392828',
+        'background-light': '#ffffff',
+        'background-dark': '#000000',
+        'surface-dark': '#111111',
+        'border-dark': '#333333',
         dark: {
-          bg: '#181111',
-          card: '#2a1a1a',
-          border: '#392828',
+          bg: '#000000',
+          card: '#111111',
+          border: '#333333',
         }
       },
       fontFamily: {
