@@ -8,7 +8,8 @@ import {
   Facebook,
   ChevronLeft,
   ChevronRight,
-  LogOut
+  LogOut,
+  Shield
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -26,6 +27,7 @@ const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
     { id: 'whatsapp', label: 'WhatsApp Automation', icon: MessageSquare },
     { id: 'instagram', label: 'Instagram Automation', icon: Instagram },
     { id: 'google-ads', label: 'Google Ads', icon: Globe },
+    { id: 'consent-management', label: 'Consent Management', icon: Shield },
     { id: 'meta-ads', label: 'Meta Ads', icon: Facebook },
   ];
 
