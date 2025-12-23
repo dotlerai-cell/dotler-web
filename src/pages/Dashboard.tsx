@@ -13,9 +13,11 @@ import {
   Instagram,
   Globe,
   Facebook,
-  Activity
+  Activity,
+  Shield
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ConsentManagement from '../components/ConsentManagement';
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -51,6 +53,13 @@ const Dashboard = () => {
       icon: Globe,
       description: 'Optimize search campaigns',
       color: 'from-blue-500 to-blue-600',
+    },
+    {
+      id: 'consent-management',
+      title: 'Consent Management',
+      icon: Shield,
+      description: 'Manage cookie consent and privacy',
+      color: 'from-purple-500 to-indigo-600',
     },
     {
       id: 'meta-ads',
@@ -220,6 +229,10 @@ const Dashboard = () => {
     if (!feature) return null;
 
     const Icon = feature.icon;
+
+    if (featureId === 'consent-management') {
+      return <ConsentManagement />;
+    }
 
     return (
       <div className="space-y-6">
