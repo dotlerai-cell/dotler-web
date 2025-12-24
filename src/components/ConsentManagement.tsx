@@ -13,6 +13,9 @@ import { db } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext'; 
 import Card from './Card';
 
+// Step 1: Define the Global Version Constant
+const CURRENT_POLICY_VERSION = "1.1"; 
+
 interface StatsData {
   totalUsers: number;
   consented: number;
@@ -27,7 +30,10 @@ const ConsentManagement = () => {
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // 1. Load Individual User Preferences
+  // NEW: Phase 5 State for Notification
+  const [showNotice, setShowNotice] = useState(false);
+
+  // 1. Load Individual User Preferences and Check Version
   useEffect(() => {
     const fetchUserPreferences = async () => {
       if (currentUser) {
@@ -36,6 +42,15 @@ const ConsentManagement = () => {
           const userData = userDoc.data();
           setAiOptOut(userData.aiOptOut || false);
           setMarketingConsent(userData.marketingConsent || false);
+
+          // Step 2: Compare Versions to Trigger Notice
+          const lastAgreed = userData.lastAgreedVersion || "1.0";
+          if (lastAgreed < CURRENT_POLICY_VERSION) {
+            setShowNotice(true);
+          }
+        } else {
+          // New user logic: show notice if they have no profile yet
+          setShowNotice(true);
         }
       }
     };
@@ -66,45 +81,57 @@ const ConsentManagement = () => {
     return () => unsubscribe(); 
   }, []);
 
-  /**
-   * NEW: DPDPA Requirement D4 - Append-only Audit Logging
-   * Creates a permanent record of every consent change
-   */
   const saveAuditLog = async (action: string, status: boolean) => {
     if (!currentUser) return;
     try {
-      // Create a new unique document in the 'consent_logs' collection
       const logRef = doc(collection(db, 'consent_logs')); 
       await setDoc(logRef, {
         userId: currentUser.uid,
         userEmail: currentUser.email,
         action: action, 
         status: status ? "OPTED_OUT / ENABLED" : "ACTIVE / DISABLED",
-        timestamp: Date.now(), // Precise audit timestamp
+        timestamp: Date.now(),
         platform: "Dotler.ai CMP",
-        version: "1.0-DPDPA" // Versioning for compliance tracking
+        version: CURRENT_POLICY_VERSION 
       });
     } catch (error) {
       console.error("Audit log error:", error);
     }
   };
 
-  // 3. Updated AI Toggle with Audit Logging
+  // Step 3: Handle Policy Update Acknowledgment
+  const handleAcknowledgeUpdate = async () => {
+    if (!currentUser) return;
+    setSaving(true);
+    try {
+      // Update User Version in Firestore
+      await setDoc(doc(db, 'users', currentUser.uid), {
+        lastAgreedVersion: CURRENT_POLICY_VERSION,
+        lastUpdated: Date.now()
+      }, { merge: true });
+
+      // Create Audit Log of Acknowledgement
+      await saveAuditLog("POLICY_UPDATE_ACKNOWLEDGED", true);
+      
+      setShowNotice(false);
+    } catch (error) {
+      console.error("Error acknowledging update:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleToggleAiTraining = async () => {
     if (!currentUser) return;
     setSaving(true);
     const newValue = !aiOptOut;
     try {
-      // Update Current State
       await setDoc(doc(db, 'users', currentUser.uid), {
         aiOptOut: newValue,
         email: currentUser.email,
         lastUpdated: Date.now()
       }, { merge: true });
-
-      // Generate Immutable Audit Entry
       await saveAuditLog("AI_TRAINING_PREFERENCE_CHANGE", newValue);
-      
       setAiOptOut(newValue);
     } catch (error) {
       console.error("Error saving preference:", error);
@@ -113,7 +140,6 @@ const ConsentManagement = () => {
     }
   };
 
-  // 4. Updated Marketing Toggle with Audit Logging
   const handleToggleMarketing = async () => {
     if (!currentUser) return;
     setSaving(true);
@@ -123,10 +149,7 @@ const ConsentManagement = () => {
         marketingConsent: newValue,
         lastUpdated: Date.now()
       }, { merge: true });
-
-      // Generate Immutable Audit Entry
       await saveAuditLog("MARKETING_SHARING_PREFERENCE_CHANGE", newValue);
-      
       setMarketingConsent(newValue);
     } catch (error) {
       console.error("Error saving marketing preference:", error);
@@ -135,7 +158,6 @@ const ConsentManagement = () => {
     }
   };
 
-  // 5. Data Portability (Export JSON)
   const handleExportData = () => {
     if (!currentUser) return;
     const dataToExport = {
@@ -143,7 +165,8 @@ const ConsentManagement = () => {
       email: currentUser.email,
       preferences: { ai_training_opt_out: aiOptOut, marketing_consent: marketingConsent },
       exported_at: new Date().toISOString(),
-      platform: "Dotler.ai CMP"
+      platform: "Dotler.ai CMP",
+      policy_version: CURRENT_POLICY_VERSION
     };
     const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -154,14 +177,12 @@ const ConsentManagement = () => {
     URL.revokeObjectURL(url);
   };
 
-  // 6. Right to Erasure (Delete Data)
   const handleDeleteMyData = async () => {
     if (!currentUser) return;
     const confirmDelete = window.confirm("Are you sure? This will permanently delete your privacy preferences.");
     if (confirmDelete) {
       setSaving(true);
       try {
-        // Log the erasure request before deleting the record
         await saveAuditLog("USER_DATA_ERASURE_REQUESTED", true);
         await deleteDoc(doc(db, 'users', currentUser.uid));
         setAiOptOut(false);
@@ -186,6 +207,25 @@ const ConsentManagement = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-white">Consent Management</h1>
       </div>
+
+      {/* Step 4: UI Notification Banner */}
+      {showNotice && (
+        <div className="p-4 bg-blue-600/20 border border-blue-500/50 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="flex items-center space-x-3">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping" />
+            <p className="text-blue-100 text-sm">
+              <span className="font-bold">Privacy Update:</span> We've updated our data processing notice (v{CURRENT_POLICY_VERSION}). Please review.
+            </p>
+          </div>
+          <button 
+            onClick={handleAcknowledgeUpdate}
+            disabled={saving}
+            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-all"
+          >
+            {saving ? 'Saving...' : 'Acknowledge'}
+          </button>
+        </div>
+      )}
 
       <Card className="border-primary/30 bg-primary/5">
         <h3 className="text-xl font-semibold text-white mb-4">Your Privacy Settings</h3>
