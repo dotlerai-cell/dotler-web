@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Card from './Card';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://cmp-backend-467424984046.asia-south1.run.app';
 
 interface StatsData {
   totalUsers: number;
