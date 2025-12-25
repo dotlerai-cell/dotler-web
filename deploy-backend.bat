@@ -4,7 +4,7 @@ echo Deploying Google Ads Backend...
 cd src\GoogleAdsConsentManagement\backend
 
 echo Setting up Google Cloud project...
-gcloud config set project dotler-web
+gcloud config set project dotler-prod
 
 echo Building and deploying to Cloud Run...
 gcloud run deploy google-ads-backend ^
@@ -17,9 +17,9 @@ gcloud run deploy google-ads-backend ^
   --max-instances 10 ^
   --set-env-vars GOOGLE_CLIENT_ID=%GOOGLE_CLIENT_ID% ^
   --set-env-vars GOOGLE_CLIENT_SECRET=%GOOGLE_CLIENT_SECRET% ^
-  --set-env-vars GOOGLE_REDIRECT_URI=https://dotler-web.web.app/oauth2/callback ^
-  --set-env-vars GOOGLE_ADS_REDIRECT_URI=https://dotler-web.web.app/src/GoogleAdsConsentManagement/oauth-callback.html ^
-  --set-env-vars FRONTEND_URL=https://dotler-web.web.app ^
+  --set-env-vars GOOGLE_REDIRECT_URI=https://dotler-prod.web.app/auth/callback ^
+  --set-env-vars GOOGLE_ADS_REDIRECT_URI=https://dotler-prod.web.app/src/GoogleAdsConsentManagement/oauth-callback.html ^
+  --set-env-vars FRONTEND_URL=https://dotler-prod.web.app ^
   --set-env-vars GEMINI_API_KEY=%GEMINI_API_KEY% ^
   --set-env-vars MONGO_URI=%MONGO_URI%
 

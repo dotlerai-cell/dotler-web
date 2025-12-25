@@ -19,11 +19,11 @@ export const getGoogleAuthUrl = () => {
     scope: 'openid email profile https://www.googleapis.com/auth/adwords',
     response_type: oauthConfig.responseType,
     access_type: 'offline',
-    prompt: 'select_account',
+    prompt: 'consent',
     include_granted_scopes: 'true'
   });
   
   const url = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-  console.log('Full OAuth URL:', url);
+  console.log('Direct OAuth URL:', url);
   return url;
 };

@@ -65,81 +65,86 @@ const GoogleAdsAgenticSetup = () => {
 
   const completeSetup = async (data: any) => {
     try {
-      // Get user email from localStorage
+      // Get user data from multiple sources
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const userEmail = user.email || currentUser?.email;
+      let userEmail = user.email;
       
-      const response = await fetch(`${BACKEND_BASE}/api/complete-setup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: data.username,
-          data: data,
-          user_email: userEmail  // Send user email for token lookup
-        })
+      // If no email in localStorage, try to get it from currentUser context
+      if (!userEmail && currentUser?.email) {
+        userEmail = currentUser.email;
+        console.log('Got email from currentUser context:', userEmail);
+      }
+      
+      // If still no email, try other localStorage keys
+      if (!userEmail) {
+        const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+        userEmail = authUser.email;
+      }
+      
+      console.log('Complete setup - all data sources:', { 
+        user, 
+        userEmail, 
+        currentUserEmail: currentUser?.email,
+        localStorageKeys: Object.keys(localStorage)
       });
-
-      const result = await response.json();
       
-      if (result.error === 'oauth_required') {
-        // User needs to authenticate with Google
-        setMessages(prev => [...prev, { 
-          role: 'assistant', 
-          content: result.message + '\n\nClick the button below to sign in with Google:' 
-        }]);
-        
-        // Create OAuth button
-        const oauthButton = document.createElement('button');
-        oauthButton.textContent = 'Sign in with Google';
-        oauthButton.className = 'bg-blue-600 text-white px-4 py-2 rounded mt-2';
-        oauthButton.onclick = () => {
-          window.location.href = `${BACKEND_BASE}${result.oauth_url}`;
-        };
-        
-        // Add button to the last message
-        setTimeout(() => {
-          const lastMessage = document.querySelector('.space-y-3 > div:last-child .bg-gray-700');
-          if (lastMessage) {
-            lastMessage.appendChild(oauthButton);
-          }
-        }, 100);
-        
-        return;
-      }
-      
-      if (result.error) {
-        throw new Error(result.error);
+      if (!userEmail) {
+        // Last resort: ask user to provide email
+        userEmail = prompt('Please enter your email address:');
+        if (!userEmail) {
+          setMessages(prev => [...prev, { 
+            role: 'assistant', 
+            content: 'Error: Email is required to complete setup. Please refresh and try again.' 
+          }]);
+          return;
+        }
       }
 
-      // Setup completed successfully
-      const performanceData = result.performance_data;
-      
-      // Store performance data in localStorage for the Google Ads app
-      localStorage.setItem('googleAdsPerformanceData', JSON.stringify(performanceData));
+      // Store setup data in backend
+      try {
+        const response = await fetch(`${BACKEND_BASE}/api/store-setup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_email: userEmail,
+            developer_token: data.developer_token,
+            manager_id: data.manager_id,
+            customer_id: data.campaign_id,
+            username: data.username,
+            tokens: user.tokens || user // Pass the entire user object which contains tokens
+          })
+        });
+        
+        if (!response.ok) {
+          console.error('Failed to store setup data');
+        } else {
+          console.log('Setup data stored successfully with email:', userEmail);
+        }
+      } catch (error) {
+        console.error('Error storing setup data:', error);
+      }
 
-      // Store setup completion data
-      const setupCompletionData = {
-        user_id: data.username,
-        email: userEmail,
-        username: data.username,
+      // Setup completed successfully - redirect to Google Ads analytics app
+      const params = new URLSearchParams({
+        user_id: data.username, // Use username instead of email
+        user_email: userEmail, // Pass email separately
         customer_id: data.campaign_id,
         developer_token: data.developer_token,
         manager_id: data.manager_id,
-        timestamp: Date.now()
-      };
-      
-      localStorage.setItem('googleAdsSetupComplete', JSON.stringify(setupCompletionData));
-
-      // Open Google Ads app in new tab
-      const params = new URLSearchParams({
-        user_id: data.username,
-        username: data.username,
-        customer_id: data.campaign_id,
-        from_agentic: 'true'
+        setup_complete: 'true'
       });
       
-      const googleAdsUrl = `${window.location.origin}/src/GoogleAdsConsentManagement/frontend/index.html?${params.toString()}`;
-      window.open(googleAdsUrl, '_blank');
+      const analyticsUrl = `${window.location.origin}/src/GoogleAdsConsentManagement/frontend/index.html?${params.toString()}`;
+      
+      // Show success message and redirect
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: '🎉 Setup complete! Redirecting to Google Ads Analytics...' 
+      }]);
+      
+      setTimeout(() => {
+        window.location.href = analyticsUrl;
+      }, 2000);
       
     } catch (error) {
       console.error('Complete setup error:', error);
