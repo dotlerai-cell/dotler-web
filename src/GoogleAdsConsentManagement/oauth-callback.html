@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Completing Setup...</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        }
+        .loading { 
+            text-align: center; 
+            color: white; 
+        }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">
+        <div class="spinner"></div>
+        <h2>Completing your setup...</h2>
+        <p>Please wait while we finalize your Google Ads integration.</p>
+    </div>
+    
+    <script>
+        // Extract the authorization code and send it to the backend
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+        
+        if (error) {
+            document.querySelector('.loading').innerHTML = `
+                <h2>Setup Failed</h2>
+                <p>Error: ${error}</p>
+                <button onclick="window.close()">Close</button>
+            `;
+        } else if (code && state) {
+            // Redirect to backend OAuth callback
+            const backendUrl = 'https://google-ads-backend-32929371500.us-central1.run.app';
+            window.location.href = `${backendUrl}/oauth2/callback?code=${code}&state=${state}`;
+        } else {
+            document.querySelector('.loading').innerHTML = `
+                <h2>Invalid Request</h2>
+                <p>Missing authorization code or state.</p>
+                <button onclick="window.close()">Close</button>
+            `;
+        }
+    </script>
+</body>
+</html>

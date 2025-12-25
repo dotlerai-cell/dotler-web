@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Ads Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fa; }
+        .header { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; padding: 30px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .sidebar { position: fixed; left: 0; top: 0; width: 250px; height: 100vh; background: white; box-shadow: 2px 0 4px rgba(0,0,0,0.1); padding: 20px; }
+        .main-content { margin-left: 270px; }
+        .nav-item { padding: 10px; margin: 5px 0; cursor: pointer; border-radius: 4px; }
+        .nav-item:hover { background: #f0f0f0; }
+        .nav-item.active { background: #dc2626; color: white; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h3>Navigation</h3>
+        <div class="nav-item active">📊 Google Ads Data</div>
+        <div class="nav-item">📈 Website Tracking</div>
+        <div class="nav-item">🤖 AI Agent</div>
+        <div class="nav-item">⚙️ Account</div>
+    </div>
+    <div class="main-content">
+        <div class="header">
+            <h1>Google Ads Dashboard</h1>
+            <p id="userInfo">Loading user information...</p>
+        </div>
+        <div class="container">
+            <div class="section">
+                <h3>📊 Campaign Performance</h3>
+                <p>Your Google Ads campaigns will appear here.</p>
+                <p>Status: Ready to load data</p>
+            </div>
+            <div class="section">
+                <h3>📈 Key Metrics</h3>
+                <p>Impressions, clicks, conversions, and cost data</p>
+            </div>
+            <div class="section">
+                <h3>🎯 Campaign Management</h3>
+                <p>Create and optimize your ad campaigns</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        var params = new URLSearchParams(window.location.search);
+        var userId = params.get('user_id') || 'Not provided';
+        var customerId = params.get('customer_id') || 'Not provided';
+        document.getElementById('userInfo').textContent = 'User: ' + userId + ' | Customer: ' + customerId;
+    </script>
+</body>
+</html>

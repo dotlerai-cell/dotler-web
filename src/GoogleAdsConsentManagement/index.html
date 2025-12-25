@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Ads Manager - Dotler.ai</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .welcome-card { background: white; padding: 60px 40px; border-radius: 16px; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); max-width: 500px; margin: 10vh auto; }
+        .welcome-card h1 { font-size: 2.5em; margin-bottom: 20px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .welcome-card p { font-size: 1.1em; color: #666; margin-bottom: 40px; line-height: 1.6; }
+        .btn { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; padding: 16px 32px; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: all 0.3s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4); }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div id="welcome-page" style="display: block;">
+        <div class="welcome-card">
+            <h1>Welcome to Google Ads Manager!</h1>
+            <p>Your setup is complete. Ready to explore your Google Ads campaigns and website analytics?</p>
+            <button class="btn" onclick="goToDashboard()">Get Started</button>
+        </div>
+    </div>
+
+    <div id="dashboard" class="hidden">
+        <iframe src="frontend/index.html" style="width: 100%; height: 100vh; border: none;"></iframe>
+    </div>
+
+    <script>
+        // Handle HTML-encoded ampersands in URL
+        const searchParams = window.location.search.replace(/&amp;/g, '&');
+        const urlParams = new URLSearchParams(searchParams);
+        const fromAgentic = urlParams.get('from_agentic');
+        const userId = urlParams.get('user_id');
+        const customerId = urlParams.get('customer_id');
+        const username = urlParams.get('username');
+        
+        console.log('URL params:', { fromAgentic, userId, customerId, username });
+        
+        function goToDashboard() {
+            // Go directly to the GoogleAdsConsentManagement dashboard
+            const params = new URLSearchParams();
+            if (userId) params.set('user_id', userId);
+            if (customerId) params.set('customer_id', customerId);
+            params.set('from_dotler', 'true');
+            
+            window.location.href = `frontend/simple.html?${params.toString()}`;
+        }
+        
+        // Show welcome page for agentic setup
+        if (fromAgentic === 'true') {
+            console.log('Showing welcome page');
+            // Update welcome message with username
+            if (username) {
+                const welcomeCard = document.querySelector('.welcome-card h1');
+                if (welcomeCard) {
+                    welcomeCard.textContent = `Welcome ${decodeURIComponent(username)}!`;
+                }
+            }
+            document.getElementById('welcome-page').style.display = 'block';
+        } else {
+            console.log('Redirecting to full app');
+            // If not from agentic setup, redirect to full app
+            window.location.href = 'frontend/index.html';
+        }
+    </script>
+</body>
+</html>
