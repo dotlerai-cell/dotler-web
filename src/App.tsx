@@ -7,6 +7,8 @@ import Dashboard from './pages/Dashboard'
 import Pricing from './pages/Pricing'
 import Privacy from './pages/Privacy'
 import About from './pages/About'
+// 1. Import the AuthCallback page we created
+import AuthCallback from './pages/AuthCallback' 
 import PrivateRoute from './components/PrivateRoute'
 
 function App() {
@@ -17,6 +19,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            
+            {/* 2. ADD THIS ROUTE: This handles the Google redirect */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/about" element={<About />} />

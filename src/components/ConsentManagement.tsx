@@ -7,13 +7,15 @@ import {
   deleteDoc, 
   collection, 
   query, 
-  onSnapshot 
+  onSnapshot,
+  updateDoc,
+  orderBy // Added orderBy for sorting logs
 } from 'firebase/firestore'; 
 import { db } from '../config/firebase'; 
 import { useAuth } from '../contexts/AuthContext'; 
 import Card from './Card';
 
-// Step 1: Define Global Version for DPDPA Requirement D5
+// DPDPA Requirement D5: Global Versioning for Compliance
 const CURRENT_POLICY_VERSION = "1.1"; 
 
 interface StatsData {
@@ -22,9 +24,20 @@ interface StatsData {
   optedOut: number;
 }
 
+// Added Interface for Logs
+interface LogData {
+  id: string;
+  visitorId?: string;
+  action?: string;
+  status?: string;
+  timestamp: number;
+  marketingConsent?: boolean;
+}
+
 const ConsentManagement = () => {
   const { currentUser } = useAuth();
   const [stats, setStats] = useState<StatsData | null>(null);
+  const [logs, setLogs] = useState<LogData[]>([]); // New State for Logs
   
   const [aiOptOut, setAiOptOut] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
@@ -32,17 +45,19 @@ const ConsentManagement = () => {
   const [showNotice, setShowNotice] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
-  // 1. Load Individual Preferences and Version Check
+  // 1. LOAD ORGANIZATION PREFERENCES
   useEffect(() => {
-    const fetchUserPreferences = async () => {
-      if (currentUser) {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setAiOptOut(userData.aiOptOut || false);
-          setMarketingConsent(userData.marketingConsent || false);
+    const fetchOrgPreferences = async () => {
+      if (currentUser?.organizationId) {
+        const orgRef = doc(db, 'organizations', currentUser.organizationId);
+        const orgSnap = await getDoc(orgRef);
+        
+        if (orgSnap.exists()) {
+          const orgData = orgSnap.data();
+          setAiOptOut(orgData.aiOptOut || false);
+          setMarketingConsent(orgData.marketingConsent || false);
 
-          const lastAgreed = userData.lastAgreedVersion || "1.0";
+          const lastAgreed = orgData.lastAgreedVersion || "1.0";
           if (lastAgreed < CURRENT_POLICY_VERSION) {
             setShowNotice(true);
           }
@@ -51,56 +66,94 @@ const ConsentManagement = () => {
         }
       }
     };
-    fetchUserPreferences();
+    fetchOrgPreferences();
   }, [currentUser]);
 
-  // 2. Real-time Admin Analytics Aggregation
+  // 2. REAL-TIME ADMIN ANALYTICS
   useEffect(() => {
-    const q = query(collection(db, 'users'));
+    if (!currentUser?.organizationId) return;
+
+    const q = query(collection(db, 'organizations', currentUser.organizationId, 'users'));
+    
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (snapshot.empty) {
         setStats({ totalUsers: 0, optedOut: 0, consented: 0 });
         return;
       }
-      const total = snapshot.size;
+      const total = snapshot.size; 
       let optedOutCount = 0;
-      snapshot.forEach((doc) => {
-        if (doc.data().aiOptOut === true) optedOutCount++;
+
+      if (marketingConsent === false) {
+          optedOutCount = total;
+      } else {
+          snapshot.forEach((doc) => {
+            if (doc.data().marketingConsent === false) optedOutCount++;
+          });
+      }
+
+      setStats({ 
+        totalUsers: total, 
+        optedOut: optedOutCount, 
+        consented: total - optedOutCount 
       });
-      setStats({ totalUsers: total, optedOut: optedOutCount, consented: total - optedOutCount });
     }, (error) => {
-      console.error("Error listening to admin stats:", error);
+      console.error("Error listening to global stats:", error);
     });
     return () => unsubscribe(); 
-  }, []);
+  }, [marketingConsent, currentUser]);
 
-  // 3. DPDPA Requirement D4: Audit Logging Helper
+  // 3. NEW: REAL-TIME AUDIT LOGS FETCHER
+  useEffect(() => {
+    if (!currentUser?.organizationId) return;
+
+    // Connects to your new 'consent_logs' collection
+    const q = query(
+      collection(db, 'organizations', currentUser.organizationId, 'consent_logs'),
+      orderBy('timestamp', 'desc') // Shows newest first
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedLogs = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as LogData[];
+      setLogs(fetchedLogs);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  // 4. DPDPA REQUIREMENT D4: AUDIT LOGGING
   const saveAuditLog = async (action: string, status: boolean) => {
-    if (!currentUser) return;
+    if (!currentUser?.organizationId) return;
     try {
-      const logRef = doc(collection(db, 'consent_logs')); 
-      await setDoc(logRef, {
-        userId: currentUser.uid,
+      const logCollectionRef = collection(db, 'organizations', currentUser.organizationId, 'consent_logs');
+      const newLogRef = doc(logCollectionRef); 
+
+      await setDoc(newLogRef, {
+        orgId: currentUser.organizationId,
         userEmail: currentUser.email,
         action: action, 
-        status: status ? "OPTED_OUT / ENABLED" : "ACTIVE / DISABLED",
+        status: status ? "ENABLED" : "DISABLED",
         timestamp: Date.now(),
         platform: "Dotler.ai CMP",
         version: CURRENT_POLICY_VERSION 
       });
+      console.log("✅ Audit Log Saved to Silo:", action);
     } catch (error) {
       console.error("Audit log error:", error);
     }
   };
 
+  // 5. HANDLERS
   const handleAcknowledgeUpdate = async () => {
-    if (!currentUser) return;
+    if (!currentUser?.organizationId) return;
     setSaving(true);
     try {
-      await setDoc(doc(db, 'users', currentUser.uid), {
+      await updateDoc(doc(db, 'organizations', currentUser.organizationId), {
         lastAgreedVersion: CURRENT_POLICY_VERSION,
         lastUpdated: Date.now()
-      }, { merge: true });
+      });
       await saveAuditLog("POLICY_UPDATE_ACKNOWLEDGED", true);
       setShowNotice(false);
     } catch (error) {
@@ -111,33 +164,32 @@ const ConsentManagement = () => {
   };
 
   const handleToggleAiTraining = async () => {
-    if (!currentUser) return;
+    if (!currentUser?.organizationId) return;
     setSaving(true);
     const newValue = !aiOptOut;
     try {
-      await setDoc(doc(db, 'users', currentUser.uid), {
+      await updateDoc(doc(db, 'organizations', currentUser.organizationId), {
         aiOptOut: newValue,
-        email: currentUser.email,
         lastUpdated: Date.now()
-      }, { merge: true });
+      });
       await saveAuditLog("AI_TRAINING_PREFERENCE_CHANGE", newValue);
       setAiOptOut(newValue);
     } catch (error) {
-      console.error("Error saving preference:", error);
+      console.error("Error saving AI preference:", error);
     } finally {
       setSaving(false);
     }
   };
 
   const handleToggleMarketing = async () => {
-    if (!currentUser) return;
+    if (!currentUser?.organizationId) return;
     setSaving(true);
     const newValue = !marketingConsent;
     try {
-      await setDoc(doc(db, 'users', currentUser.uid), {
+      await updateDoc(doc(db, 'organizations', currentUser.organizationId), {
         marketingConsent: newValue,
         lastUpdated: Date.now()
-      }, { merge: true });
+      });
       await saveAuditLog("MARKETING_SHARING_PREFERENCE_CHANGE", newValue);
       setMarketingConsent(newValue);
     } catch (error) {
@@ -150,7 +202,7 @@ const ConsentManagement = () => {
   const handleExportData = () => {
     if (!currentUser) return;
     const dataToExport = {
-      user_id: currentUser.uid,
+      org_id: currentUser.organizationId,
       email: currentUser.email,
       preferences: { ai_training_opt_out: aiOptOut, marketing_consent: marketingConsent },
       exported_at: new Date().toISOString(),
@@ -161,22 +213,22 @@ const ConsentManagement = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `dotler-privacy-data-${currentUser.uid.slice(0, 5)}.json`;
+    link.download = `dotler-privacy-data-${currentUser.organizationId?.slice(0, 5)}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
   const handleDeleteMyData = async () => {
-    if (!currentUser) return;
-    const confirmDelete = window.confirm("Are you sure? This action is irreversible and deletes your privacy settings.");
+    if (!currentUser?.organizationId) return;
+    const confirmDelete = window.confirm("Are you sure? This action is irreversible and deletes your organization's settings.");
     if (confirmDelete) {
       setSaving(true);
       try {
-        await saveAuditLog("USER_DATA_ERASURE_REQUESTED", true);
-        await deleteDoc(doc(db, 'users', currentUser.uid));
+        await saveAuditLog("ORG_DATA_ERASURE_REQUESTED", true);
+        await deleteDoc(doc(db, 'organizations', currentUser.organizationId));
         setAiOptOut(false);
         setMarketingConsent(false);
-        alert("Your privacy data has been successfully erased.");
+        alert("Your organization's privacy data has been successfully erased.");
       } catch (error) {
         console.error("Error deleting data:", error);
       } finally {
@@ -186,7 +238,7 @@ const ConsentManagement = () => {
   };
 
   const handleCopySnippet = () => {
-    const code = `const userSnap = await getDoc(doc(db, 'users', userId));\nif (userSnap.exists()) {\n  const { marketingConsent } = userSnap.data();\n  if (marketingConsent) {\n    // Initialize tracking logic here...\n  }\n}`;
+    const code = `const orgSnap = await getDoc(doc(db, 'organizations', orgId));\nif (orgSnap.exists()) {\n  const { marketingConsent } = orgSnap.data();\n  if (marketingConsent) {\n    // Initialize tracking logic here...\n  }\n}`;
     navigator.clipboard.writeText(code);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
@@ -218,13 +270,14 @@ const ConsentManagement = () => {
         </div>
       )}
 
+      {/* MAIN PREFERENCES CARD */}
       <Card className="border-primary/30 bg-primary/5">
-        <h3 className="text-xl font-semibold text-white mb-4">Your Privacy Settings</h3>
+        <h3 className="text-xl font-semibold text-white mb-4">Organization Privacy Settings</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-[#333]">
             <div>
               <p className="text-white font-medium">Opt-out of AI Training</p>
-              <p className="text-sm text-gray-400">Exclude your data from non-essential AI model improvements.</p>
+              <p className="text-sm text-gray-400">Exclude data from non-essential AI model improvements.</p>
             </div>
             <button onClick={handleToggleAiTraining} disabled={saving} className={`px-4 py-2 rounded-lg font-bold transition-all ${aiOptOut ? 'bg-primary text-white' : 'bg-gray-700 text-gray-300'}`}>
               {saving ? 'Saving...' : aiOptOut ? 'Opted Out' : 'Active'}
@@ -243,8 +296,8 @@ const ConsentManagement = () => {
 
           <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-[#333]">
             <div>
-              <p className="text-white font-medium">Data Portability</p>
-              <p className="text-sm text-gray-400">Download a copy of your settings.</p>
+              <p className="text-white font-medium">Data Portability (GDPR/DPDPA)</p>
+              <p className="text-sm text-gray-400">Download a full JSON copy of your organization settings.</p>
             </div>
             <button onClick={handleExportData} className="px-4 py-2 rounded-lg font-bold bg-blue-600/20 border border-blue-500/50 text-blue-400">
               Export JSON
@@ -253,23 +306,24 @@ const ConsentManagement = () => {
 
           <div className="mt-8 pt-6 border-t border-red-900/30">
             <p className="text-red-500 font-bold text-xs uppercase tracking-widest mb-3">Danger Zone</p>
-            <button onClick={handleDeleteMyData} className="px-4 py-2 rounded-lg font-bold border border-red-600 text-red-600">
-              Delete Data
+            <button onClick={handleDeleteMyData} className="px-4 py-2 rounded-lg font-bold border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-all">
+              Delete Organization Data
             </button>
           </div>
         </div>
       </Card>
 
+      {/* GLOBAL ANALYTICS SECTION */}
       <div className="pt-8 border-t border-[#333]">
-        <h2 className="text-xl font-bold text-gray-500 mb-6 uppercase tracking-wider">Global Admin Stats</h2>
-        {stats && stats.totalUsers > 0 && (
+        <h2 className="text-xl font-bold text-gray-500 mb-6 uppercase tracking-wider">Visitor Compliance Analytics</h2>
+        {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card><h3 className="text-sm text-gray-400 mb-2">Total Users</h3><h1 className="text-4xl font-bold text-white">{stats.totalUsers}</h1></Card>
+            <Card><h3 className="text-sm text-gray-400 mb-2">Total Visitors Tracked</h3><h1 className="text-4xl font-bold text-white">{stats.totalUsers}</h1></Card>
             <Card><h3 className="text-sm text-gray-400 mb-2">Total Opt-Outs</h3><h1 className="text-4xl font-bold text-white">{stats.optedOut}</h1></Card>
-            <Card className="md:col-span-2 h-[300px]">
+            <Card className="md:col-span-2 h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={chartData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#8884d8" dataKey="value" label>
+                  <Pie data={chartData} cx="50%" cy="50%" innerRadius={80} outerRadius={110} fill="#8884d8" dataKey="value" label>
                     {chartData.map((_entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
                   </Pie>
                   <Tooltip contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px' }} />
@@ -281,6 +335,54 @@ const ConsentManagement = () => {
         )}
       </div>
 
+      {/* NEW SECTION: LIVE AUDIT LOGS */}
+      <div className="pt-8 border-t border-[#333]">
+        <h2 className="text-xl font-bold text-gray-500 mb-6 uppercase tracking-wider">Live Audit Trail</h2>
+        <Card className="bg-black/60 border border-[#333] overflow-hidden">
+          <div className="max-h-[300px] overflow-y-auto">
+            <table className="w-full text-left text-sm text-gray-400">
+              <thead className="bg-[#111] text-xs uppercase text-gray-500 sticky top-0">
+                <tr>
+                  <th className="p-3">User / Visitor</th>
+                  <th className="p-3">Action</th>
+                  <th className="p-3">Status</th>
+                  <th className="p-3">Time</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#222]">
+                {logs.length === 0 ? (
+                  <tr><td colSpan={4} className="p-4 text-center">No logs found</td></tr>
+                ) : (
+                  logs.map((log) => (
+                    <tr key={log.id} className="hover:bg-white/5 transition-colors">
+                      <td className="p-3 font-mono text-xs text-white">
+                        {log.visitorId || "System Admin"}
+                      </td>
+                      <td className="p-3">
+                        {log.action || (log.visitorId ? "VISITOR_CONSENT_CHANGE" : "UNKNOWN_ACTION")}
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded text-[10px] font-bold ${
+                          (log.marketingConsent === true || log.status === "ENABLED") 
+                            ? "bg-green-900/30 text-green-400" 
+                            : "bg-red-900/30 text-red-400"
+                        }`}>
+                          {log.status || (log.marketingConsent ? "ACCEPTED" : "DENIED")}
+                        </span>
+                      </td>
+                      <td className="p-3 text-xs">
+                        {new Date(log.timestamp).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+
+      {/* DEVELOPER TOOLS */}
       <div className="pt-8 border-t border-[#333] mt-8">
         <h2 className="text-xl font-bold text-gray-500 mb-6 uppercase tracking-wider">Developer Integration Tool</h2>
         <Card className="bg-black/60 border-blue-500/20">
@@ -297,17 +399,19 @@ const ConsentManagement = () => {
           </div>
           <div className="bg-black p-4 rounded-lg font-mono text-xs overflow-x-auto border border-[#333]">
             <pre className="text-green-400">
-{`// 1. Fetch user's latest consent
-const userSnap = await getDoc(doc(db, 'users', userId));
+{`// 1. Fetch organization's latest consent
+const orgSnap = await getDoc(doc(db, 'organizations', orgId));
 
-if (userSnap.exists()) {
-  const { marketingConsent } = userSnap.data();
+if (orgSnap.exists()) {
+  const { marketingConsent } = orgSnap.data();
 
   // 2. The Logic Gate
   if (marketingConsent) {
     // Initializing tracking for Google/Meta Ads...
+    console.log("Tracking Enabled by Org Admin");
   } else {
-    // Block tracking: User opted out
+    // Block tracking: Workspace opted out
+    console.log("Tracking Blocked by DPDPA Logic Gate");
   }
 }`}
             </pre>
@@ -317,5 +421,5 @@ if (userSnap.exists()) {
     </div>
   );
 };
-
+ 
 export default ConsentManagement;

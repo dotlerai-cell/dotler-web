@@ -7,10 +7,25 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+# package-lock.json  <-- I REMOVED THIS so it saves to GitHub
+# yarn.lock          <-- I REMOVED THIS so it saves to GitHub
+# pnpm-lock.yaml     <-- I REMOVED THIS so it saves to GitHub
+
+# Build outputs
 dist
 dist-ssr
+build/
+.next/
+out/
 *.local
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
 
 # Editor directories and files
 .vscode/*
@@ -22,25 +37,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Environment variables
-.env
-.env.local
-.env.production
-.env.development
-
-# Dependencies
-node_modules/
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# Build outputs
-dist/
-dist-ssr/
-build/
-.next/
-out/
 
 # Cache
 .cache/
@@ -56,7 +52,7 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# IDE
+# IDE (Duplicates from above, but keeping for your peace of mind)
 .vscode/
 .idea/
 *.swp
