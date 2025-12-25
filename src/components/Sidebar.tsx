@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom'; // 1. Import useNavigate
 import { 
   LayoutDashboard, 
   MessageSquare, 
@@ -21,6 +22,7 @@ interface SidebarProps {
 const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { logout, currentUser } = useAuth();
+  const navigate = useNavigate(); // 2. Initialize the hook
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -30,6 +32,17 @@ const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
     { id: 'consent-management', label: 'Consent Management', icon: Shield },
     { id: 'meta-ads', label: 'Meta Ads', icon: Facebook },
   ];
+
+  // 3. Helper function to handle clicks
+  const handleNavigation = (id: string) => {
+    if (id === 'instagram') {
+      // If Instagram is clicked, go to the new Module Route
+      navigate('/instagram');
+    } else {
+      // Otherwise, keep the old behavior (stay on Dashboard and switch tabs)
+      setActiveSection(id);
+    }
+  };
 
   return (
     <motion.div
@@ -71,7 +84,7 @@ const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
           return (
             <button
               key={item.id}
-              onClick={() => setActiveSection(item.id)}
+              onClick={() => handleNavigation(item.id)} // 4. Use the new handler
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 isActive
                   ? 'bg-primary text-white'
