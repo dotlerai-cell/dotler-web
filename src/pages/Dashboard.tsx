@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import GoogleAds from './GoogleAds';
+import AdminPage from '../whatsapp-automation/whatsapp-automation-frontend/pages/AdminPage';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -22,6 +23,10 @@ import ConsentManagement from '../components/ConsentManagement';
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
+
+  // Debug: log active section changes
+  useEffect(() => {
+  }, [activeSection]);
 
   const statsData = [
     { name: 'Mon', revenue: 4200, spend: 1200 },
@@ -124,7 +129,12 @@ const Dashboard = () => {
         {features.map((feature) => {
           const Icon = feature.icon;
           return (
-            <Card key={feature.id} hover className="cursor-pointer">
+            <Card 
+              key={feature.id} 
+              hover 
+              className="cursor-pointer"
+              onClick={() => setActiveSection(feature.id)}
+            >
               <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4`}>
                 <Icon className="w-6 h-6 text-white" />
               </div>
@@ -227,10 +237,7 @@ const Dashboard = () => {
 
   const renderFeatureContent = (featureId: string) => {
     const feature = features.find(f => f.id === featureId);
-    if (!feature) return null;
-
-    const Icon = feature.icon;
-
+    
     if (featureId === 'consent-management') {
       return <ConsentManagement />;
     }
@@ -239,6 +246,19 @@ const Dashboard = () => {
       return <GoogleAds />;
     }
 
+    if (featureId === 'whatsapp') {
+      return (
+        <div className="h-[calc(100vh-240px)] w-full flex flex-col">
+          <AdminPage />
+        </div>
+      );
+    }
+
+    if (!feature) {
+      return null;
+    }
+
+    const Icon = feature.icon;
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
@@ -279,6 +299,11 @@ const Dashboard = () => {
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
+        
+        {/* DEBUG: Show active section */}
+        <div className="px-6 py-2 bg-gray-900 border-b border-gray-800 text-xs text-gray-400">
+          DEBUG: activeSection = <span className="font-bold text-primary">{activeSection}</span>
+        </div>
         
         <main className="flex-1 overflow-y-auto p-6 bg-black">
           <motion.div

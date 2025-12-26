@@ -71,7 +71,7 @@ const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
           return (
             <button
               key={item.id}
-              onClick={() => setActiveSection(item.id)}
+              onClick={() => { console.log('[Sidebar] clicked ->', item.id); setActiveSection(item.id); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 isActive
                   ? 'bg-primary text-white'
