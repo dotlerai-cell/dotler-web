@@ -1,133 +1,328 @@
-# Dotler.ai - AI-Powered Ad Automation Platform
+# AdVantage - Multi-Company Meta Ads Platform
 
-A modern, full-stack web application for automating ad campaigns across multiple platforms including WhatsApp, Instagram, Google Ads, and Meta Ads.
+🚀 **AI-Powered platform where companies can connect their Meta Ads accounts, view analytics, and create campaigns.**
 
-## Features
+Built with React, Vite, Firebase, and Meta Marketing API.
 
-- **Firebase Authentication**: Secure login with Google OAuth and email/password
-- **Modern Dashboard**: Clean, intuitive interface with real-time metrics
-- **Dark/Light Theme**: Toggle between themes with persistent preferences
-- **Collapsible Sidebar**: Space-efficient navigation with smooth animations
-- **Four Core Modules**:
-  - WhatsApp Automation
-  - Instagram Automation
-  - Google Ads Management
-  - Meta Ads Management
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Real-time Analytics**: Interactive charts and performance metrics
+## 🚀 Tech Stack
 
-## Tech Stack
+- **Frontend**: React 18 + Vite
+- **Authentication**: Firebase Auth (Email/Password + Google)
+- **Hosting**: Firebase Hosting
+- **Database**: Firestore (optional)
+- **Routing**: React Router v6
+- **API**: Meta Marketing API v19.0
 
-- **Frontend**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
-- **Charts**: Recharts
-- **Icons**: Lucide React
-- **Routing**: React Router DOM
-- **Authentication**: Firebase Auth
-- **Backend**: Node.js (ready for integration)
+## ✨ Features
 
-## Getting Started
+- 🔐 **Authentication** - Email/Password and Google Sign-In
+- 📊 **Real-time Dashboard** - Live Meta Ads metrics
+- 🎯 **Campaign Management** - Create and manage campaigns
+- 📈 **Analytics** - Performance tracking and insights
+- 🤖 **AI Agents** - Multi-agent system monitoring
+- 🌓 **Theme Switcher** - Dark/Light mode
+- 📱 **Responsive Design** - Works on all devices
 
-### Prerequisites
+## 📋 Prerequisites
 
-- Node.js 18+ and npm/yarn
-- Firebase project with authentication enabled
+- Node.js 16+ and npm
+- Firebase account
+- Meta Business account with API access
 
-### Installation
+## 🛠️ Quick Setup
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd dotler
-```
+### 1. Install Dependencies
 
-2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Set up environment variables:
-```bash
-# Copy the example env file
-cp .env.example .env
+### 2. Configure Environment
 
-# Edit .env and add your Firebase configuration
+Copy `.env.example` to `.env` and add your credentials:
+
+```bash
+cp .env.example .env
 ```
 
-4. Start the development server:
+Edit `.env` with your Firebase and Meta credentials (already configured for Firebase).
+
+### 3. Setup Meta OAuth (For Multi-Company Support)
+
+1. Go to [Meta for Developers](https://developers.facebook.com/)
+2. Create a new app (Business type)
+3. Add **Facebook Login for Business** and **Marketing API**
+4. Add OAuth redirect URI: `http://localhost:3000/auth/callback`
+5. Copy App ID to `.env` → `VITE_META_APP_ID`
+
+### 4. Deploy Cloud Functions (Optional - for production)
+
+```bash
+cd functions
+npm install
+firebase deploy --only functions
+```
+
+## 🏃 Run Development Server
+
 ```bash
 npm run dev
 ```
 
-5. Open your browser and navigate to `http://localhost:5173`
+Open [http://localhost:3000](http://localhost:3000)
 
-### Build for Production
+**Default Login:** Use your email or Google account to sign up.
+
+## 🏗️ Build
+
+Build for production:
 
 ```bash
 npm run build
 ```
 
-The production-ready files will be in the `dist` directory.
+Preview production build:
 
-## Project Structure
+```bash
+npm run preview
+```
+
+## 🚀 Deployment
+
+### Build for Production
+```bash
+npm run build
+```
+
+### Deploy to Firebase
+```bash
+# Deploy everything
+firebase deploy
+
+# Or deploy separately
+firebase deploy --only hosting
+firebase deploy --only functions
+firebase deploy --only firestore:rules
+```
+
+Your app will be live at: `https://your-project-id.web.app`
+
+### Before Production
+1. Complete Meta App Review
+2. Get Advanced Access for permissions
+3. Update OAuth redirect URIs
+4. Set up monitoring and alerts
+
+## 📁 Project Structure
 
 ```
-dotler/
+advantage/
 ├── src/
-│   ├── components/       # Reusable UI components
-│   │   ├── Button.tsx
-│   │   ├── Card.tsx
-│   │   ├── Header.tsx
-│   │   ├── Sidebar.tsx
-│   │   └── PrivateRoute.tsx
-│   ├── contexts/         # React contexts
-│   │   ├── AuthContext.tsx
-│   │   └── ThemeContext.tsx
-│   ├── pages/           # Page components
-│   │   ├── Login.tsx
-│   │   └── Dashboard.tsx
-│   ├── config/          # Configuration files
-│   │   └── firebase.ts
-│   ├── App.tsx          # Main app component
-│   ├── main.tsx         # Entry point
-│   └── index.css        # Global styles
-├── public/              # Static assets
-├── index.html
+│   ├── components/          # Reusable React components
+│   │   ├── Sidebar.jsx
+│   │   ├── Header.jsx
+│   │   ├── AgentFeed.jsx
+│   │   └── PerformanceChart.jsx
+│   ├── contexts/            # React contexts
+│   │   └── AuthContext.jsx  # Authentication context
+│   ├── hooks/               # Custom React hooks
+│   │   └── useMetaAPI.js    # Meta API integration hook
+│   ├── pages/               # Page components
+│   │   ├── Login.jsx        # Login/Signup page
+│   │   ├── Dashboard.jsx    # Main dashboard
+│   │   ├── Analytics.jsx    # Analytics page
+│   │   ├── Campaign.jsx     # Campaign creation
+│   │   └── Agents.jsx       # Agent monitor
+│   ├── services/            # API services
+│   │   └── api.js           # Meta Marketing API
+│   ├── styles/              # CSS modules
+│   ├── firebase.js          # Firebase configuration
+│   ├── App.jsx              # Main app component
+│   ├── App.css
+│   ├── main.jsx             # Entry point
+│   └── index.css
+├── public/                  # Static assets
+├── .env                     # Environment variables (create this)
+├── .env.example             # Environment template
+├── .gitignore
+├── firebase.json            # Firebase hosting config
+├── .firebaserc              # Firebase project config
+├── vite.config.js           # Vite configuration
 ├── package.json
-├── tsconfig.json
-├── tailwind.config.js
-└── vite.config.ts
+└── README.md
 ```
 
-## Firebase Configuration
+## 🔐 How Companies Use It
 
-Firebase credentials are stored securely in environment variables. To set up:
+### Step 1: Sign Up
+Company users sign up with email/password or Google account.
 
-1. Create a `.env` file in the root directory (use `.env.example` as template)
-2. Add your Firebase project credentials to the `.env` file
-3. Make sure your Firebase project has:
-   - Authentication enabled (Google and Email/Password providers)
-   - Authorized domains configured for your deployment
+### Step 2: Connect Meta Account
+1. Click "Connect Meta" in sidebar
+2. Authorize with their Meta Business account (OAuth)
+3. Select ad accounts to connect
+4. Tokens stored encrypted server-side
 
-**Important**: Never commit the `.env` file to version control. It's already included in `.gitignore`.
+### Step 3: View Analytics
+- Real-time campaign metrics
+- ROAS tracking
+- Spend monitoring
+- Performance insights
 
-## Features in Development
+### Step 4: Create Campaigns
+- Fill campaign form
+- Set budgets and objectives
+- Publish directly to their Meta Ads account
 
-- WhatsApp automation workflows
-- Instagram post scheduling and analytics
-- Google Ads campaign optimization
-- Meta Ads creative management
-- A/B testing studio
-- Advanced analytics dashboard
-- Budget allocation AI
-- Creative studio with AI-generated copy
+## 🏗️ Architecture
 
-## Contributing
+```
+Company User → Your Platform → Firebase Auth
+                    ↓
+            Connect Meta (OAuth)
+                    ↓
+        Meta Business Account Authorization
+                    ↓
+    Access Token (encrypted) → Firestore
+                    ↓
+        Cloud Functions → Meta API
+                    ↓
+        Analytics & Campaign Management
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Security Features
+- ✅ OAuth 2.0 authentication
+- ✅ Tokens encrypted with AES-256
+- ✅ Server-side API proxy (Cloud Functions)
+- ✅ Per-company data isolation
+- ✅ Firestore security rules enforced
 
-## License
+## 🤖 AI Agent System
 
-This project is proprietary and confidential.
+### Agents
+1. **Manager Agent** - Orchestrates decisions
+2. **Analyst Agent** - Analyzes performance data
+3. **Inventory Agent** - Monitors stock levels
+4. **Creative Agent** - Optimizes ad creative
+
+### Features
+- Live agent feed
+- Real-time decision logging
+- Multi-agent coordination
+- Automated optimization
+
+## 🎨 Theming
+
+Toggle between dark and light themes:
+- Click theme button in header (🌙/☀️)
+- Preference saved in localStorage
+- Smooth transitions
+
+## 🔧 Configuration
+
+### Vite Config (`vite.config.js`)
+```javascript
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    outDir: 'dist',
+    sourcemap: true
+  },
+  server: {
+    port: 3000,
+    open: true
+  }
+})
+```
+
+### Firebase Config (`firebase.json`)
+```json
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
+```
+
+## 🐛 Troubleshooting
+
+### Firebase Auth Issues
+- Check Firebase Console → Authentication → Sign-in methods
+- Ensure Email/Password and Google are enabled
+- Add authorized domains
+
+### Meta API Errors
+- Verify access token is valid
+- Check ad account ID format: `act_XXXXXXXXXX`
+- Ensure token has required permissions
+
+### Build Errors
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Deployment Issues
+```bash
+# Rebuild and redeploy
+npm run build
+firebase deploy --only hosting
+```
+
+## 📝 Scripts
+
+```json
+{
+  "dev": "vite",                    // Start dev server
+  "build": "vite build",            // Build for production
+  "preview": "vite preview",        // Preview production build
+  "deploy": "npm run build && firebase deploy"  // Build and deploy
+}
+```
+
+## 🔒 Security
+
+- Never commit `.env` file
+- Use environment variables for sensitive data
+- Enable Firebase security rules
+- Implement rate limiting for API calls
+
+## 📚 Resources
+
+- [Vite Documentation](https://vitejs.dev/)
+- [React Documentation](https://react.dev/)
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [Meta Marketing API](https://developers.facebook.com/docs/marketing-apis)
+- [React Router](https://reactrouter.com/)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## 📄 License
+
+This project is for educational and demonstration purposes.
+
+## 🆘 Support
+
+For issues and questions:
+1. Check browser console for errors
+2. Review Firebase console for auth/hosting issues
+3. Check network tab for API errors
+4. Review SETUP.md for detailed instructions
+
+---
+
+**Built with ❤️ using Vite + React + Firebase**
