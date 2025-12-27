@@ -1,0 +1,127 @@
+/* AdditionalInfoInput Component Styles */
+
+.additional-info-input {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.additional-info-input h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+}
+
+/* Character Counter */
+.character-counter {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary, #666);
+  transition: color 0.2s ease;
+}
+
+.character-counter.near-limit {
+  color: var(--warning-color, #f59e0b);
+}
+
+.character-counter.at-limit {
+  color: var(--error-text, #c33);
+  font-weight: 600;
+}
+
+/* Textarea */
+.info-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 120px;
+  transition: all 0.2s ease;
+  background-color: var(--bg-primary, #fff);
+  color: var(--text-primary, #333);
+  box-sizing: border-box;
+}
+
+.info-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color, #1877f2);
+  box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
+}
+
+.info-textarea::placeholder {
+  color: var(--text-placeholder, #999);
+  opacity: 1;
+}
+
+/* Input Hint */
+.input-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+/* Dark Theme Support */
+[data-theme='dark'] .additional-info-input h3 {
+  color: var(--text-primary, #e0e0e0);
+}
+
+[data-theme='dark'] .character-counter {
+  color: var(--text-secondary, #999);
+}
+
+[data-theme='dark'] .character-counter.near-limit {
+  color: var(--warning-color, #fbbf24);
+}
+
+[data-theme='dark'] .character-counter.at-limit {
+  color: var(--error-text, #f87171);
+}
+
+[data-theme='dark'] .info-textarea {
+  background-color: var(--bg-secondary, #2a2a2a);
+  border-color: var(--border-color, #444);
+  color: var(--text-primary, #e0e0e0);
+}
+
+[data-theme='dark'] .info-textarea::placeholder {
+  color: var(--text-placeholder, #666);
+}
+
+[data-theme='dark'] .input-hint {
+  color: var(--text-secondary, #999);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .input-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .character-counter {
+    font-size: 12px;
+  }
+
+  .info-textarea {
+    font-size: 13px;
+    min-height: 100px;
+  }
+
+  .input-hint {
+    font-size: 11px;
+  }
+}

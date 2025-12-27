@@ -1,0 +1,42 @@
+/* Red and Black Color Scheme - Dark Theme (Default) */
+:root,
+body[data-theme="dark"] {
+    --primary-blue: #FF0000;
+    --dark-blue: #CC0000;
+    --light-blue: #FFCCCC;
+    --accent-blue: #FF3333;
+    --accent-color: #FF0000;
+    --dark-bg: #000000;
+    --card-bg: #1A1A1A;
+    --sidebar-bg: #111111;
+    --bg-primary: #1A1A1A;
+    --bg-secondary: #2A2A2A;
+    --text-primary: #FFFFFF;
+    --text-secondary: #CCCCCC;
+    --border-color: #333333;
+    --success-green: #00FF00;
+    --warning-red: #FF0000;
+    --warning-yellow: #FFFF00;
+    --terminal-bg: #000000;
+}
+
+/* Light Theme */
+body[data-theme="light"] {
+    --primary-blue: #FF0000;
+    --dark-blue: #CC0000;
+    --light-blue: #FFCCCC;
+    --accent-blue: #FF3333;
+    --accent-color: #FF0000;
+    --dark-bg: #F5F5F5;
+    --card-bg: #FFFFFF;
+    --sidebar-bg: #FFFFFF;
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F5F5F5;
+    --text-primary: #000000;
+    --text-secondary: #666666;
+    --border-color: #CCCCCC;
+    --success-green: #00AA00;
+    --warning-red: #FF0000;
+    --warning-yellow: #FFCC00;
+    --terminal-bg: #F0F0F0;
+}

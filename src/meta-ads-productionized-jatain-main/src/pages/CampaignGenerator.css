@@ -1,0 +1,340 @@
+/* Campaign Generator Page Styles */
+
+/* Page Introduction */
+.page-intro {
+  margin-bottom: 24px;
+}
+
+.page-description {
+  margin: 0 0 16px 0;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+/* Two-Column Layout */
+.campaign-generator-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  transition: grid-template-columns 0.3s ease;
+}
+
+/* Column Styles */
+.campaign-form-column,
+.ai-assistant-column {
+  min-height: 500px;
+  transition: all 0.3s ease;
+}
+
+/* Side-by-side layout for >1024px with independent scrolling */
+@media (min-width: 1025px) {
+  .campaign-form-column {
+    position: sticky;
+    top: 24px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+
+  .ai-assistant-column {
+    position: sticky;
+    top: 24px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+
+  /* When AI panel is collapsed, expand form to full width */
+  .campaign-generator-layout:has(.ai-assistant-panel.collapsed) {
+    grid-template-columns: 1fr auto;
+  }
+
+  .campaign-generator-layout:has(.ai-assistant-panel.collapsed) .campaign-form-column {
+    max-width: 100%;
+  }
+}
+
+/* Scrollbar Styling */
+.campaign-form-column::-webkit-scrollbar,
+.ai-assistant-column::-webkit-scrollbar {
+  width: 8px;
+}
+
+.campaign-form-column::-webkit-scrollbar-track,
+.ai-assistant-column::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.campaign-form-column::-webkit-scrollbar-thumb,
+.ai-assistant-column::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.campaign-form-column::-webkit-scrollbar-thumb:hover,
+.ai-assistant-column::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Error Display */
+.generation-error {
+  background: rgba(240, 40, 73, 0.1);
+  border: 1px solid var(--warning-red);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.generation-error h3 {
+  color: var(--warning-red);
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.generation-error p {
+  color: var(--text-secondary);
+  margin: 0 0 1rem 0;
+}
+
+.retry-button {
+  background-color: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  background-color: #5568d3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.retry-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive Layout */
+/* Stacked layout for <1024px */
+@media (max-width: 1024px) {
+  .campaign-generator-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  /* Remove sticky positioning on smaller screens */
+  .campaign-form-column,
+  .ai-assistant-column {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  /* Stack AI Assistant Panel above form on mobile */
+  .ai-assistant-column {
+    order: -1;
+  }
+
+  /* Ensure collapsed panel doesn't take full width */
+  .campaign-generator-layout:has(.ai-assistant-panel.collapsed) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Further adjustments for mobile devices */
+@media (max-width: 768px) {
+  .campaign-generator-layout {
+    gap: 16px;
+  }
+}
+
+.retry-button {
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  background-color: var(--dark-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(8, 102, 255, 0.3);
+}
+
+.retry-button:active {
+  transform: translateY(0);
+}
+
+/* Smooth scroll behavior for independent scrolling */
+.campaign-form-column,
+.ai-assistant-column {
+  scroll-behavior: smooth;
+}
+
+/* Optimize for performance during transitions */
+@media (prefers-reduced-motion: reduce) {
+  .campaign-generator-layout,
+  .campaign-form-column,
+  .ai-assistant-column {
+    transition: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .ai-assistant-column {
+    display: none;
+  }
+
+  .campaign-generator-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Submission Status Display */
+.submission-status {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 300px;
+  max-width: 500px;
+  text-align: center;
+  animation: slideUp 0.3s ease-out;
+  border: 1px solid var(--border-color);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.submission-status.submitting {
+  border-left: 4px solid var(--primary-blue);
+}
+
+.submission-status.success {
+  border-left: 4px solid var(--success-green);
+}
+
+.submission-status.error {
+  border-left: 4px solid var(--warning-red);
+}
+
+.submission-status p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.submission-status .campaign-id {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-family: monospace;
+  margin-top: 0.5rem;
+}
+
+.submission-status .error-details {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  max-height: 150px;
+  overflow-y: auto;
+  margin: 1rem 0;
+  text-align: left;
+  padding: 0.5rem;
+  background-color: var(--dark-bg);
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.submission-status .status-icon {
+  display: inline-block;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.submission-status.success .status-icon {
+  color: var(--success-green);
+}
+
+.submission-status.error .status-icon {
+  color: var(--warning-red);
+}
+
+.submission-status .status-spinner {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top: 4px solid var(--primary-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.submission-status .retry-button {
+  margin-top: 1rem;
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submission-status .retry-button:hover {
+  background-color: var(--dark-blue);
+}
+
+/* Mobile adjustments for submission status */
+@media (max-width: 768px) {
+  .submission-status {
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    min-width: auto;
+    max-width: none;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

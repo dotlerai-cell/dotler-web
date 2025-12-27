@@ -1,0 +1,100 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment variables - CRITICAL: Never commit these!
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Firebase
+.firebase/
+.firebaserc.local
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+*-debug.log
+
+# Firebase Functions
+functions/node_modules/
+functions/.env
+functions/.env.local
+
+# Build outputs
+build/
+dist/
+.cache/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+.temp/
+.tmp/
+*.swp
+*~
+
+# Sensitive documents (if they contain real data)
+ad-acc-insights.pdf
+ad-acc-insights.txt
+
+# Documentation files (exclude from repo)
+ARCHITECTURE.md
+CONFIGURATION.md
+DASHBOARD_FEATURES.md
+DEPLOYMENT_GUIDE.md
+SECURITY.md
+src/hooks/README.md
+src/config/README.md
+src/components/campaign/README.md
+src/components/ai-assistant/README.md
+src/pages/RESPONSIVE_LAYOUT.md
+src/utils/ERROR_HANDLING_GUIDE.md
+src/components/campaign/AUTO_FILL_IMPLEMENTATION.md
+src/services/README_DRAFT_SERVICE.md
+
+# Kiro IDE files
+.kiro/
+
+# Test files (optional - uncomment to exclude)
+# **/__tests__/
+# *.test.js
+# *.test.jsx
+
+# Demo pages (optional - uncomment to exclude)
+# src/pages/*Demo.jsx
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Package manager locks (optional - uncomment if you want to ignore)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

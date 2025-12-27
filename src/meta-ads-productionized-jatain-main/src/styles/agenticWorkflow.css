@@ -1,0 +1,296 @@
+/* Agentic Workflow Dashboard Styles - Meta Ads Theme */
+.agentic-workflow-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.workflow-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.workflow-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.workflow-header p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+
+.workflow-section {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.workflow-section h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.campaign-description-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 150px;
+  transition: border-color 0.2s;
+  background: var(--sidebar-bg);
+  color: var(--text-primary);
+}
+
+.campaign-description-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(8, 102, 255, 0.1);
+}
+
+.advanced-options-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.advanced-options-content {
+  padding: 16px;
+  background: var(--sidebar-bg);
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.workflow-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.workflow-logs {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--sidebar-bg);
+}
+
+.log-entry {
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  display: flex;
+  gap: 12px;
+}
+
+.log-timestamp {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  min-width: 60px;
+}
+
+.log-message {
+  flex: 1;
+}
+
+.log-info {
+  background: rgba(8, 102, 255, 0.1);
+  color: var(--primary-blue);
+}
+
+.log-success {
+  background: rgba(66, 183, 42, 0.1);
+  color: var(--success-green);
+}
+
+.log-error {
+  background: rgba(240, 40, 73, 0.1);
+  color: var(--warning-red);
+}
+
+.log-warning {
+  background: rgba(255, 193, 7, 0.1);
+  color: var(--warning-yellow);
+}
+
+.log-progress {
+  background: rgba(8, 102, 255, 0.05);
+  color: var(--primary-blue);
+}
+
+.log-empty {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+}
+
+.campaign-result {
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  background: var(--card-bg);
+}
+
+.campaign-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.campaign-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.campaign-objective {
+  background: var(--primary-blue);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.campaign-details {
+  display: grid;
+  gap: 20px;
+}
+
+.detail-section {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.detail-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.detail-section h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-section p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.ad-copy-list, .headlines-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0 0;
+}
+
+.ad-copy-list li, .headlines-list li {
+  padding: 8px 12px;
+  background: var(--sidebar-bg);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border-left: 3px solid var(--primary-blue);
+}
+
+.workflow-metadata {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--sidebar-bg);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.metadata-content {
+  margin: 0;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: var(--text-primary);
+}
+
+.document-summary {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(66, 183, 42, 0.1);
+  border-radius: 8px;
+  border-left: 4px solid var(--success-green);
+}
+
+.document-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0 0;
+}
+
+.document-list li {
+  padding: 6px 0;
+  color: var(--success-green);
+}
+
+.error-section {
+  background: rgba(240, 40, 73, 0.1);
+  border: 1px solid var(--warning-red);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 24px;
+}
+
+.error-message {
+  color: var(--warning-red);
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .workflow-section {
+    padding: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .campaign-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
